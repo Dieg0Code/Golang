@@ -6,9 +6,9 @@ Go genera archivos .EXE portables a cualquier sistema operativo y versión (Su E
 
 Go se creo pensando en los procesadores modernos los cuales poseen mas de un núcleo lo que permite que puedan ejecutar procesos multi-hilo, lenguajes antiguos como C por ejemplo no tenían en cuenta esto ya que en ese tiempo no existía el hardware.
 
-Es un lenguaje fuertemente tipado, las variables deben ser declaradas antes de ser utilizadas.
+Es un lenguaje fuertemente tipado, las variables deben ser declaradas antes de ser utilizadas, sino lo hacemos Golang nos borra la variable.
 
-Go obliga al desarrollador a llevar buenas prácticas, por ejemplo no nos deja declarar variables que no se utilizan o cuando declaramos alguna función o método global, go no obliga a comentarlas. Go no te deja compilar si no respetamos estas normas.
+Go obliga al desarrollador a llevar buenas prácticas, por ejemplo no nos deja declarar variables que no se utilizan o cuando declaramos alguna función o método global, go nos obliga a comentarlas. Go no te deja compilar si no respetamos estas normas.
 
 Go demostró ser el lenguaje ideal para grandes desarrollos con miles y miles usuarios concurrentes y millones de transacciones por segundo.
 
@@ -79,7 +79,7 @@ var entero16 int16 = 32767
 var entero32 int32 = 2147483647
 var entero64 int64 = 9223372036854775807
 
-// También están los enteros con y sin signo
+// También están los enteros sin signo
 
 var sinSigno uint = 1
 var sinSigno2 uint8 = 255
@@ -125,7 +125,7 @@ package main
 
 func main() {
     var numero float32 = 1.23
-    var numero2 int = numero
+    var numero2 int = numero // Error
 }
 ```
 
@@ -262,3 +262,134 @@ func main() {
 ```
 
 En `Go` hay una diferencia entre usar `fmt.ScanF` y `fmt.Scanln`, si es que estamos usándolo en windows, esto es debido a como maneja windows los saltos de línea, lo cual seria `\n\r`, mientras que en Linux es solo `\n`, por lo que si usamos `fmt.ScanF` en windows, el programa no funcionaría, porque tomara el `\r` como el segundo parámetro, esto se soluciona con `fmt.Scanln`.
+
+Una alternativa es usar `bufio.NewScanner` para leer los datos por consola, por ejemplo:
+
+```go
+package main
+
+import (
+	"fmt"
+	"os"
+	"bufio"
+)
+
+var numero int
+var numero1 int
+var result int
+var leyenda string
+
+func main() {
+	fmt.Println("Introduce un numero")
+
+	scanner := bufio.NewScanner(os.Stdin)
+	if scanner.Scan() {
+		leyenda = scanner.Text()
+	}
+
+	result = numero + numero1
+	fmt.Println(leyenda, result)
+}
+```
+
+## Ciclos en Go
+
+En Go solo existe el ciclo `for` para iterar sobre una secuencia de datos, esto es debido a que en `go` esta sentencia está enriquecida de tal manera que puede ser usada para reemplazar cualquier otro ciclo.
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+
+	i := 1
+	for i <= 10 {
+		fmt.Println(i)
+		i++
+	}
+
+}
+```
+
+Esta es una forma de crear un ciclo for, pero podemos hacerlo también de una manera más tradicional:
+
+```go
+
+func main() {
+
+	for i := 1; i <= 10; i++ {
+		fmt.Println(i)
+	}
+
+}
+```
+
+En `Go` no es necesario poner los paréntesis al escribir un for.
+
+Podemos romper un ciclo for con un `break`:
+
+```go
+func main() {
+
+	num := 0
+	for {
+		fmt.Println("continue")
+		fmt.Println("ingrese un numero")
+		fmt.Scanln(&num)
+		if num == 0 {
+			break
+		}
+	}
+}
+```
+
+Escribir un ``for`` de esta manera, sin condiciones, hace que sea infinito, es por eso que debemos poner un `break` en alguna condicional, a menos que queramos que sea infinito a propósito.
+
+Así mismo, como existe el `break`, podemos romper un ciclo for con un `continue`:
+
+```go
+func main() {
+
+	var i := 0
+
+	for i < 10 {
+		fmt.Println("\n Valor de i: %d", i)
+		if i == 5 {
+			fmt.Println("Multiplicamos por 2 \n")
+			i = i * 2
+			continue
+		}
+
+		fmt.Println("Paso por aquí")
+		i++
+	}
+
+}
+```
+
+El `continue` también rompe el ciclo `for`, pero no de la misma manera, el `continue` lo que hace es que reinicia el ciclo, es decir, vuelve al principio sin dejar que se ejecuten las instrucciones que están debajo del `continue`.
+
+En `Go` también existe algo llamado `GOTO` el cual es una forma de nombrar una porción de código con el fin de poder llamarla luego en base el nombre que le demos.
+
+```go
+func main() {
+
+	var i int = 0
+
+	RUTINA:
+		for i < 10 {
+			if i == 4 {
+				i = i + 2
+				fmt.Println("Voy a RUTINA sumando 2 a i")
+				goto RUTINA
+			}
+
+			fmt.Printf("Valor de i: %d\n", i)
+			i++
+		}
+}
+
+```
+
+De esta forma, usando la instrucción `goto`, podemos volver a ejecutar esa porción de código que etiquetamos con el nombre de `RUTINA` en este caso.
