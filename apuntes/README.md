@@ -510,3 +510,146 @@ func main() {
 
 }
 ```
+
+## Funciones anónimas y closures
+
+Las funciones anónimas son funciones que no tienen nombre, en go podemos crear una variable y ponerle que sea de tipo `func`, con esto podemos aislar el código de la función dentro de una variable y así luego poder modificar ese código en `tiempo de ejecución`, cosa que no puedo hacer con una función normal.
+
+Por ejemplo, no puedo crear una función suma y luego modificarla en tiempo ded ejecución, para esto tenemos que crear una función anónima:
+
+```go
+package main
+
+import "fmt"
+
+var Calculo func(int, int) int = func(a int, b int) int {
+	return a + b
+}
+
+func main() {
+
+	fmt.Println("Sumo 5 + 7 = %d \n", Calculo(5, 7)) // Sumo 5 + 7 = 12
+
+}
+```
+
+Para crear una variable de tipo `func` debemos primero declarar cuanto parámetros recibirá, los tipos y el tipo del valor de retorno, luego a la derecha de `=` declaramos la función es sí misma, nombramos los parámetros, ponemos el tipo de valor de retorno y luego el cuerpo de la función.
+
+De esta forma estamos creando una función anónima cuyo resultado es almacenado en la variable `Calculo`.
+
+Pero ¿cual es la gracia de las funciones anónimas? si todo eso podemos hacerlo con una función normal. Lo especial de esto es que puedo redefinir `Calculo` cosa que no puedo hacer con una función normal.
+
+Por ejemplo:
+
+```go
+package main
+
+import "fmt"
+
+var Calculo func(int, int) int = func(a int, b int) int {
+	return a + b
+}
+
+
+func main() {
+
+	Calculo = func(a int, b int) int {
+		return a - b
+	}
+
+	fmt.Println("Restamos 6 - 4 = %d \n", Calculo(6, 4)) // Restamos 6 - 4 = 2
+
+}
+```
+
+Esto es lo mas parecido que tenemos en Go a una sobrecarga, con la diferencia de que en otros lenguajes podemos cambiar la cantidad de parámetros, pero en go no podemos, en go tenemos que respetar la misma cantidad de parámetros de entrada, el tipo de parámetros de entrada y solo así puedo redefinir el cuerpo de la función.
+
+Podemos también crear una función normal cuyo valor de retorno sea una función anónima.
+
+```go
+
+func Operaciones() {
+	resultado := func() int {
+
+		var a int = 23
+		var b int = 13
+
+		return a + b
+	}
+
+	fmt.Println(resultado()) // 36
+}
+
+func main() {
+
+	Operaciones() // 36
+
+}
+
+```
+
+## Closures
+
+Los `closures` son un concepto de funciones anónimas que tienen que ver con la protección y el aislamiento de código.
+
+Una de las características de los closures es que pueden acceder al valor de variables creadas por fuera de scope de la función.
+
+Una closure es una función cuyo valor de retorno es una función anónima.
+
+```go
+
+func Tabla(valor int) func() int {
+
+	numero := valor
+	secuencia := 0
+
+	return func() int {
+		secuencia++
+		return numero * secuencia
+	}
+
+}
+```
+
+Tenemos dos `return`, uno es el de la función anónima y el otro es el de la función normal.
+
+```go
+func main() {
+
+	// CLosure
+	tablaDel := 2
+	MiTabla := Tabla(tablaDel)
+	
+	// la variable "MiTabla" se convierte en una función, debido
+	// a que el valor de retorno de la función "Tabla"
+	// es una función anónima.	
+
+	for i := 1; i < 11; i++ {
+		fmt.Println(MiTabla())
+	}
+
+}
+
+// El resultado es:
+// 2
+// 4
+// 6
+// 8
+// 10
+// 12
+// ...
+```
+
+Cuando ejecutamos la función `Tabla()` lo que estamos ejecutando es el `return` de esta, lo cual en este caso es una función anónima, por lo que en realidad estamos ejecutando esa parte del código de la función `Tabla()`.
+
+En la primera ejecución de la función se va a ejecutar la primera parte, en donde declaramos la variable `numero` y la variable `secuencia`.
+
+Cuando declaramos `MiTabla`:
+
+```go
+tablaDel := 2
+
+MiTabla := Tabla(tablaDel)
+```
+
+No toma todo el código de la función `Tabla()`, sino que toma lo que le devuelve esta función.
