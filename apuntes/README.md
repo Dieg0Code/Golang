@@ -393,3 +393,120 @@ func main() {
 ```
 
 De esta forma, usando la instrucción `goto`, podemos volver a ejecutar esa porción de código que etiquetamos con el nombre de `RUTINA` en este caso.
+
+## Funciones en Go
+
+Las funciones en `Go` se declaran usando la palabra reservada `func`, seguida del nombre de la función, los parámetros de la función, el tipo de dato que retornará y el cuerpo de la función.
+
+En `Go` todo son funciones, no existen los métodos, en Go estos son funciones en si mismos que solo no devuelven ningún valor.
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+
+	fmt.Println(uno(5)) // 6	
+}
+
+func uno(numero int) int {
+	return numero + 1
+}
+```
+
+En `Go` existe la peculiaridad de que una función puede devolver dos valores:
+
+```go
+func dos(numero int) (int, bool) {
+	if numero == 5 {
+		return 1, true
+	} else {
+		return 0, false
+	}
+}
+```
+
+Entonces, para poder mostrar el resultado de la función no podemos solo imprimir el valor con `fmt.Println`, sino que debemos capturar los valores de retorno en dos variables distintas:
+
+```go
+func main() {
+
+	numero, estado := dos(5)
+	fmt.Println(numero, estado) // 1 true
+}
+```
+
+Otra variante al declarar una función en go es poner un nombre al valor de retorno, por ejemplo:
+
+```go
+func tres(numero int) (z int) {
+	z = numero * 2
+	return
+}
+```
+
+De esta forma no es necesario especificar el valor de retorno, con solo el `return` se entiende que estamos devolviendo el valor `z` que se declaró al principio de la función.
+
+### Parámetros variables
+
+Los parámetros variables son parámetros dinámicos en donde yo no sé el número de parámetros de entrada.
+
+Hay una falencia que tiene `Go` que es que no tiene sobrecarga de funciones o sobrecarga de métodos, a diferencia de lenguajes como C# o Java, en donde podemos escribir el mismo método o función N veces con diferentes tipos de parámetros de entrada. Esto es muy útil en programación porque permite que uno ejecute distinto tipo de código llamando al mismo método, pero dependiendo del parámetro que le pasemos va a comportarse de una manera u otra.
+
+`Go` lo que si tiene implementado y sirve como una forma de polimorfismo son los parámetros variables, por ejemplo:	
+
+```go
+func Calculo(numero ...int) int {
+	total := 0
+
+	for _, num := range numero {
+		total += num
+	}
+
+	return total
+}
+```
+
+La palabra reservada `range` me devuelve siempre dos valores, lo que coloque a continuación de range debe ser una lista, un vector, etc.
+
+En este caso, al ser parámetros variables, los convierte en una lista e itera por sobre cada uno de los elementos.
+
+
+El primer valor que devuelve range es el numero del elemento, nos dice si es el elemento uno, dos, tres, etc., en este caso no necesitamos ese dato por lo que puedo nombrarlo como `_`. En `Go` esto se usa para nombrar a los datos que no usaremos. Go no nos permite saltarnos pasos, si una función devuelve dos valores no puedo ignorar uno de estos.
+
+
+```go
+func main() {
+
+	fmt.Println(Calculo(1, 2, 3, 4, 5)) // 15
+}
+```
+
+Lo que hace nuestra función es sumar todos los valores que le pasemos como parámetro y nos devuelve el total.
+
+Si queremos, también podemos mostrar el valor del item en el que estamos iterando:
+
+```go
+func Calculo(numero ...int) int {
+	total := 0
+
+	for i, num := range numero {
+		fmt.Printf("El valor de i es: %d\n", i)
+		fmt.Printf("El valor de num es: %d\n", num)
+		total += num
+	}
+
+	return total
+}
+
+func main() {
+
+	fmt.Println(Calculo(1, 2, 3, 4, 5)) // el valor de i es: 0 
+										// el valor de num es: 1
+										// ... 1, 2, 3, 4, 5
+	total := Calculo(1, 2, 3, 4, 5)
+	fmt.Println(total) // 15
+
+}
+```
