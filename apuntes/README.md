@@ -653,3 +653,162 @@ MiTabla := Tabla(tablaDel)
 ```
 
 No toma todo el código de la función `Tabla()`, sino que toma lo que le devuelve esta función.
+
+## Arreglos estáticos y Slices
+
+
+
+En Go los arreglos se pueden declarar especificando el tipo de datos de la colección y la cantidad de elementos que contiene.
+
+```go
+package main
+
+import "fmt"
+
+var tabla [10]int
+
+func main() {
+	fmt.Println(tabla) // [0 0 0 0 0 0 0 0 0 0]
+
+	tabla[0] = 1
+	tabla[1] = 2
+
+	fmt.Println(tabla) // [1 2 0 0 0 0 0 0 0 0]
+}
+```
+
+En go los tipos de datos se inicializan con valores por defecto, por ejemplo}: los de tipo `int` se inicializan con `0` y los de tipo `string` se inicializan con `""` una cadena vacía y los de tipo `bool` se inicializan con `false`.
+
+Puedo declarar un arreglo y inicializarlo con valores de inmediato.
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+
+	tabla := [10]int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+
+}
+```
+
+Por lo generar para recorrer los elementos de una colección usamos el ciclo `for`.
+
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+
+	tabla := [10]int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+
+	for i := 0; i < len(tabla); i++ {
+		fmt.Println(tabla[i])
+	}
+
+}
+```
+
+La función `len()` devuelve la cantidad de elementos de un arreglo, en este caso le decimos al ciclo que siga mientras ` i < len(tabla) `, es decir mientras que `i` sea menor a la cantidad de elementos del arreglo.
+
+Podemos también tener matrices, es decir un arreglo de arreglos.
+
+```go
+package main
+
+import "fmt"
+
+var matriz [5][7]int // lo cual significa que tenemos una matriz
+					 // de 5 filas y 7 columnas, es decir
+					 // 5 arreglos de 7 elementos cada uno.
+
+func main() {
+
+	for i := 0; i < len(matriz); i++ {
+		for j := 0; j < len(matriz[i]); j++ {
+			
+			fmt.Printf("%d ", matriz[i][j])
+
+		}
+	}
+
+}
+```
+
+Las matrices pueden ser recorridas usando un ciclo `for` anidado, uno que recorra las filas y otro que recorra las columnas.
+
+### Slices
+
+Los **vectores dinámicos**, a diferencia de los arreglos que son estáticos en los que debemos respetar la cantidad de elementos con la que se declaró el arreglo, no tenemos ese problema, podemos agregar cuantos elementos queramos.
+
+Debemos tener en cuenta son dinámicos porque los puedo modificar durante el tiempo de ejecución.
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+
+	slice := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}	
+
+}
+```
+
+Para indicar que es un arreglo dinámico tan solo debemos usar los `[]` sin ninguna longitud dentro, con esto Go entiende que lo que declaramos fue un arreglo de enteros de longitud variable.
+
+```go
+package main
+
+import "fmt"
+
+func variante2() {
+	elementos := [5]int{1,2,3,4,5}
+	porcion := elementos[3:] // Con esta linea estamos diciendo
+							 // que porción va a tomar todos los
+							 // valores desde el 3 indices hasta el final.
+							 // es decir [4,5]
+	porcion := elementos[2:5] // desde el indice 2 hasta el 5
+}
+
+func main() {
+
+
+
+}
+```
+
+Los slices nos permiten tomar porciones de arreglos mas grandes, indicándoles el indice de inicio y el indice de fin.
+
+```go
+package main
+
+import "fmt"
+
+func variante3() {
+
+	elementos := make([]int, 5, 20)
+	fmt.Println(elementos) // [0 0 0 0 0]
+	fmt.Println("Largo %d, Capacidad %d", len(elementos), cap(elementos)) // Largo 5, Capacidad 20
+}
+```
+
+Con `make()` estamos creando un arreglo dinámico de enteros, el cual va a tener una longitud de 5 elementos, pero una capacidad de 20.
+
+```go
+package main
+
+import "fmt"
+
+func variante4() {
+
+	nums := make([]int, 0, 0)
+	for i := 0; i < 100; i++ {
+		nums = append(nums, i)
+	}
+	fmt.Println("Largo %d, Capacidad %d", len(nums), cap(nums)) // Largo 100, Capacidad 128
+}
+```
