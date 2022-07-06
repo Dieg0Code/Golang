@@ -812,3 +812,91 @@ func variante4() {
 	fmt.Println("Largo %d, Capacidad %d", len(nums), cap(nums)) // Largo 100, Capacidad 128
 }
 ```
+
+## Mapas
+
+Un mapa es una estructura que se puede serializar, como un vector, es decir podemos guardar una colección de elementos que podemos recorrer luego.
+
+Un mapa es una colección de pares clave-valor.
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	countries := make(map[string]string)
+	fmt.Println(countries) // map[]
+
+
+	countries["MX"] = "Mexico"
+	countries["US"] = "Estados Unidos"
+	countries["AR"] = "Argentina"
+
+	fmt.Println(countries["MX"]) // Mexico
+}
+```
+
+Esto sirve para poder guardar colecciones de datos en donde luego la búsqueda va a ser mas sencilla, a diferencia de un vector en donde solo tengo el indice para acceder a los datos, en los maps tengo la clave.
+
+Puedo también declarar la cantidad de elementos que voy a tener en el mapa usando `make()`.
+
+```go
+countries := make(map[string]string, 10)
+```
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+
+	campeonato := map[string]int{
+		"Barcelona": 39,
+		"Real":      38,
+		"Atletico":  37
+	}
+
+	fmt.Println(campeonato) // map[Atletico:37 Barcelona:39 Real:38]
+
+}
+```
+
+Para agregar un elemento al mapa:
+
+```go
+// Busca si el mapa tiene la clave, sino la agrega junto con el valor
+campeonato["Colo-Colo"] = 36
+```
+
+Para modificar un elemento del mapa:
+
+```go
+campeonato["Barcelona"] = 40
+// Lo modificamos usando la clave
+```
+
+Para eliminar un elemento del mapa:
+
+```go
+// delete() recibe como argumento el mapa y la clave para eliminar el par
+delete(campeonato, "Barcelona")
+```
+
+Para recorre un mapa:
+
+```go
+for equipo, puntaje := range campeonato {
+	fmt.Println("El equipo %s tiene un puntaje de %d", equipo, puntaje)
+}
+```
+
+Para recorrer una mapa podemos usar un ciclo `for` y el comando `range` el cual nos devuelve ambos valores.
+
+Para saber si un elemento existe en un mapa:
+
+```go
+puntaje, existe := campeonato["Mineirao"]
+fmt.Println("El puntaje capturado es %d, y el equipo existe %t", puntaje, existe) // El puntaje capturado es 0, y el equipo existe false
+```
