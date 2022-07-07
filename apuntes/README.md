@@ -1202,3 +1202,104 @@ func main() {
 
 }
 ```
+
+## Manejo de archivos en Go
+
+Tenemos diferentes maneras de leer y escribir archivos en Go.
+
+Las principales bibliotecas que podemos usar para esto son:
+
+```go
+import (
+	"bufio"
+	"io/ioutil"
+	"os"
+)
+```
+
+Una forma de leer es usando `ioututil.ReadFile`:
+
+```go
+func leoArchivo() {
+	archivo, err := ioutil.ReadFile("./archivo.txt")
+	if err != nil {
+		fmt.Println("Hubo un error")
+	} else {
+		fmt.Println(string(archivo))
+	}
+}
+```
+
+Las funciones del sistema siempre regresan dos valores, es este caso es un `archivo` y también puede regresar un `error`, es por eso que siempre debemos escribir:
+
+```go
+if err != nil {
+	fmt.Println("Hubo un error")
+}
+```
+
+Con lo que definimos un comportamiento si es que hay un error, porque ``err`` siempre debería ser nulo, por ende, si es diferente de nulo entonces...
+
+En go nulo se representa con `nil`.
+
+Otra forma de leer es usando `os.Open`:
+
+```go
+func leoArchivo1() {
+	archivo, err := os.Open("./archivo.txt")
+	if err != nil {
+		fmt.Println("Hubo un error")
+	} else {
+		scanner := bufio.NewScanner(archivo)
+		for scanner.Scan() {
+			registro := scanner.Text()
+			fmt.Printf("Linea > " + registro + "\n")
+		}
+	}
+	archivo.Close()
+
+}
+```
+
+Luego con un `for` escaneamos linea por linea el archivo, esto nos puede ser util se estamos buscando algo en especifico, por que si lo encontramos podemos actuar en consecuencia.
+
+Para escribir en el archivo podemos usar `os.Create`:
+
+```go
+func graboArchivo() {
+	archivo, err := os.Create("./nuevoArchivo.txt")
+	if err != nil {
+		fmt.Println("Hubo un error 1")
+		return
+	}
+	fmt.Fprintln(archivo, "Esto es un nuevo archivo")
+	archivo.Close()
+}
+```
+
+Otra forma es:
+
+```go
+func graboArchivo1() {
+	fileName := "./nuevoArchivo.txt"
+	if !Append(fileName, "\n Esta es una segunda linea") {
+		fmt.Println("[graboArchivo1] Hubo un error")
+	}
+}
+
+func Append(archivo string, texto string) bool {
+	arch, err := os.OpenFile(archivo, os.O_APPEND|os.O_WRONLY, 0600)
+	if err != nil {
+		fmt.Println("[Append] Hubo un error")
+		return false
+	}
+
+	_, err = arch.WriteString(texto)
+	if err != nil {
+		fmt.Println("[WriteString] Hubo un error 3")
+		return false
+	}
+
+	return true
+}
+```
