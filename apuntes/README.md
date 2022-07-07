@@ -1303,3 +1303,27 @@ func Append(archivo string, texto string) bool {
 	return true
 }
 ```
+
+## Recursividad en Go
+
+La recursividad es básicamente una función que se llama a sí misma, esto se hace para que la función se ejecute un número indeterminado de veces, a menos que especifiquemos una condición bajo la cual finalize.
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	exponencia(2)
+}
+
+func exponencia(numero int) {
+	if numero > 100 {
+		return
+	}
+	fmt.Println(numero)
+	exponencia(numero * 2)
+}
+```
+
+De esta forma la función recibe inicialmente un 2, pasa por la condición y luego se llama a sí misma, ese 2 que inicialmente le pasamos lo multiplica por 2 y se ejecuta nuevamente, solo que ahora ``numero`` vale 4, luego valdrá 8 y así sucesivamente.
