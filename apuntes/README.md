@@ -900,3 +900,111 @@ Para saber si un elemento existe en un mapa:
 puntaje, existe := campeonato["Mineirao"]
 fmt.Println("El puntaje capturado es %d, y el equipo existe %t", puntaje, existe) // El puntaje capturado es 0, y el equipo existe false
 ```
+
+## Estructuras (POO en Go)
+
+En Go no existe la programación orientada a objetos como la conocemos, en donde tenemos una clase con sus métodos, etc. no la herencia y el polimorfismo no funciona igual a como la conocemos en Java o algún otro lenguaje.
+
+Go implementa una nueva forma de hacer la programación orientada a objetos, para eso se basa en las `struct`.
+
+```go
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+type user struct {
+	Id 			int
+	Nombre 		string
+	FechaAlta 	time.Time
+	Status 		bool
+}
+
+func main() {
+
+	User := new(user)
+	User.Id = 1
+	User.Nombre = "Juan"
+	User.FechaAlta = time.Now()
+	User.Status = true
+	fmt.Println(User)
+
+}
+```
+
+En Go no existe los métodos como tal, sino que debemos usar una función que tenga una variable que apunte a una estructura, de esa forma cada vez que mencionemos esa variable estaremos haciendo referencia directamente a esa estructura.
+
+```go
+// Creamos un nuevo archivo llamado user.go
+package user
+
+import "time"
+
+type User struct {
+	Id 			int
+	Nombre 		string
+	FechaAlta 	time.Time
+	Status 		bool
+}
+
+func (usr *User) setUser(id int, nombre string, fechaAlta time.Time, status bool) {
+	usr.Id = id
+	usr.Nombre = nombre
+	usr.FechaAlta = fechaAlta
+	usr.Status = status
+}
+
+func (usr *User) getUser() {
+	fmt.Println("Id: ", usr.Id)
+	fmt.Println("Nombre: ", usr.Nombre)
+	fmt.Println("Fecha de alta: ", usr.FechaAlta)
+	fmt.Println("Status: ", usr.Status)
+}
+
+func main() {
+
+	User := new(User)
+	User.setUser(1, "Juan", time.Now(), true)
+	User.getUser()
+
+}
+```
+
+De esta forma podemos crear una especie de métodos
+
+También podemos hacer una especie de herencia de la siguiente forma:
+
+```go
+package main
+
+import (
+	"fmt"
+	"time"
+
+	us "./user"
+)
+
+type pepe struct {
+	us.User
+}
+
+func main() {
+	user := new(pepe)
+	user.setUser(1, "Juan", time.Now(), true)
+	fmt.Println(user.User)
+}
+```
+
+De esta forma la `struct` `pepe` hereda el método `setUser` de la `struct` `User`.
+
+También es importante mencionar la forma en la que importamos paquetes en Go, en este caso lo hacemos con:
+
+```go
+import(
+	us "./user"
+)
+```
+
+Al importar el paquete `user` bajo el nombre `us` podemos acceder a todos los métodos de la `struct` y propiedades de `User`, lo que estamos haciendo es importar la carpeta `user`, go supone que dentro del paquete `user` hay un archivo llamado `user.go`, si lo nombrásemos de otra forma no funcionaría.
