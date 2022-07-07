@@ -1008,3 +1008,197 @@ import(
 ```
 
 Al importar el paquete `user` bajo el nombre `us` podemos acceder a todos los métodos de la `struct` y propiedades de `User`, lo que estamos haciendo es importar la carpeta `user`, go supone que dentro del paquete `user` hay un archivo llamado `user.go`, si lo nombrásemos de otra forma no funcionaría.
+
+## Interfaces
+
+Las interfaces nos permiten definir conductas, operaciones, comportamientos.
+
+Si lo llevamos al mundo real, podemos decir que los humanos tenemos ciertos comportamientos, por ejemplo, el pensar, por lo que si creamos un objeto y decimos que tiene la capacidad de pensar, estaríamos diciendo que ese objeto implementa la interfaz "humano".
+
+Las interfaces se tratan de crear funciones que definen que un objeto tenga una característica determinada, por ejemplo, puedo tener una estructura llamada perro, una llamada gato, las cuales no tienen nada que las una, pero puedo implementar una interfaz que sea del tipo "mamífero" la cual tenga ciertas acciones que son comunes a los perros y los gatos como comer, correr, etc. y puedo también tener funciones que devuelvan valores que son comunes a los perros y los gatos como por ejemplo una función que se llame cantidad de patas y me devuelva la cantidad de patas que tenga cada una de las especies.
+
+```go
+package main
+
+import "fmt"
+
+type humano interface {
+	respirar()
+	comer()
+	pensar()
+	sexo() string
+}
+
+type hombre struct {
+	edad int
+	altura float32
+	peso float32
+	respirando bool
+	comiendo bool
+}
+
+type mujer struct {
+	edad int 
+	altura float32
+	peso float32
+	respirando bool
+	comiendo bool
+}
+
+func (h *hombre) respirar()    { h.respirando = true }
+func (h *hombre) comer()       { h.comiendo = true }
+func (h *hombre) pensar()      { h.pensando = true }
+func (h *hombre) sexo() string { return "Hombre" }
+
+func (m *mujer) respirar()    { m.respirando = true }
+func (m *mujer) comer()       { m.comiendo = true }
+func (m *mujer) pensar()      { m.pensando = true }
+func (m *mujer) sexo() string { return "Mujer" }
+
+func HumanoRespirando(hu humano) {
+	hu.respirar()
+	fmt.Printf("Soy un/a %s, y estoy respirando \n", hu.sexo())
+}
+
+func main() {
+	Pedro := new(hombre)
+	HumanoRespirando(Pedro)
+
+	Maria := new(mujer)
+	HumanoRespirando(Maria)
+}
+```
+
+En la `interface humano` definimos métodos que son comunes a todos los humanos, por ejemplo, respirar, comer, pensar, etc.
+
+Con las `structs` hombre y mujer definimos las estructuras que luego implementan la `interface humano`.
+
+```go
+func (h *hombre) respirar()    { h.respirando = true }
+func (h *hombre) comer()       { h.comiendo = true }
+func (h *hombre) pensar()      { h.pensando = true }
+func (h *hombre) sexo() string { return "Hombre" }
+
+func (m *mujer) respirar()    { m.respirando = true }
+func (m *mujer) comer()       { m.comiendo = true }
+func (m *mujer) pensar()      { m.pensando = true }
+func (m *mujer) sexo() string { return "Mujer" }
+```
+
+No hace falta indicar de forma explicita que las estructuras están implementando la interfaz humano con alguna palabra reservada como `implements`, go se da cuenta solo de que es así.
+
+Si nos fijamos, estamos repitiendo varios atributos que realidad son los mismo en hombre y mujer, es por eso que podemos simplemente heredar a mujer todas las propiedades de hombre.
+
+```go
+package main
+
+type hombre struct {
+	edad int
+	altura float32
+	peso float32
+	respirando bool
+	comiendo bool
+	esHombre bool
+}
+
+type mujer struct {
+	hombre
+}
+```
+
+No es necearía entonces implementar la interface para mujer, ya que la hereda de hombre.
+
+Cambiamos un poco la función ``sexo()``:
+
+```go
+func (h *hombre) sexo() string {
+	if h.esHombre {
+		return "Hombre"
+	}
+	return "Mujer"
+}
+```
+
+Y se debería comportar de la misma manera:
+
+```go
+func main() {
+	Juan := new(hombre)
+	Juan.esHombre = true
+	fmt.Println("Juan")
+	HumanoRespirando(Juan)
+
+	Maria := new(mujer)
+	Maria.esHombre = false
+	fmt.Println("Maria")
+	HumanoRespirando(Maria)
+}
+```
+
+Lo que me permiten las interfaces es relacionar objetos del mismo tipo, esto me permite crear polimorfismo en mi programa.
+
+Por ejemplo, puedo crear una interfaz aún mas abstrcta que englobe a humano y a animal, la interfaz **SerVivo**:
+
+```go
+package main
+
+import "fmt"
+
+type SerVivo interface {
+	estaVivo() bool
+}
+
+type humano interface {
+	respirar()
+	comer()
+	pensar()
+	sexo() string
+	estaVivo() bool
+}
+
+type animal interface {
+	respirar()
+	comer()
+	EsCarnivoro() bool
+	estaVivo() bool
+}
+
+type hombre struct {
+	edad       int
+	altura     float32
+	peso       float32
+	respirando bool
+	pensando   bool
+	comiendo   bool
+	esHombre   bool
+	vivo       bool
+}
+
+type perro struct {
+	respirando bool
+	comiendo   bool
+	carnivoro  bool
+	vivo       bool
+}
+
+func (h *hombre) estaVivo() bool { return h.vivo }
+
+func (p *perro) estaVivo() bool { return p.vivo }
+
+func estoyVivo(sv SerVivo) bool {
+	return sv.estaVivo()
+}
+
+func main() {
+	totalCarnivoros := 0
+	Dogo := new(perro)
+	Dogo.carnivoro = true
+	Dogo.vivo = true
+	AnimalRespirando(Dogo)
+	totalCarnivoros += AnimalesCarnivoros(Dogo)
+	fmt.Printf("Total de animales carnivoros: %d \n", totalCarnivoros)
+
+	fmt.Printf("Estoy vivo: %t \n", estoyVivo(Dogo))
+
+}
+```
