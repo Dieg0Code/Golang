@@ -1327,3 +1327,85 @@ func exponencia(numero int) {
 ```
 
 De esta forma la función recibe inicialmente un 2, pasa por la condición y luego se llama a sí misma, ese 2 que inicialmente le pasamos lo multiplica por 2 y se ejecuta nuevamente, solo que ahora ``numero`` vale 4, luego valdrá 8 y así sucesivamente.
+
+## Excepciones y manejo de errores (defer, panic, recover)
+
+A diferencia de otros lenguajes, aquí no hay nada como un `try/catch` o un `exception`.
+
+El `defer` es una instrucción que se va a ejecutar si o si cuando se detecta que una función se va por un `return`, por un error o por un fin de función.
+
+```go
+package main
+
+import (
+	"fmt"
+	"os"
+)
+
+func main() {
+	archivo := "prueba.txt"
+	f, err := os.OpenFile(archivo)
+
+	defer f.Close()
+
+	if err != nil {
+		fmt.Println("Hubo un error al abrir el archivo")
+		os.Exit(1)
+	}
+
+}
+```
+
+Cuando coloco una instrucción antecedida por `defer` esa instrucción no se ejecuta secuencialmente, se va a ejecutar recién cuando yo salga de la función.
+
+Lo que estoy diciendo con:
+
+```go
+defer f.Close()
+```
+
+Es que antes de salir de la función, ya sea por un error o porque finalizó, que cierre el archivo.
+
+### Panic y Recover
+
+`Panic` es una forma de forzar un error el cual hace que el sistema aborte la ejecución del programa.
+
+```go
+func ejemploPanic() {
+	a := 1
+	if a == 1 {
+		panic("Panic")
+	}
+}
+```
+
+Esto se hace cuando por validación encontramos que hay un dato que nos falta que es crucial y que no puede continuar el programa sin ese dato, para eso se usa `panic`.
+
+Panic no me da chance de continuar con el programa, ya que aborta la ejecución, para poder tener el control después de un `panic` debo usar `recover`:
+
+```go
+func ejemploPanic() {
+	defer func() {
+		reco := recover()
+
+		if reco != nil {
+			log.Fatalf("Ocurrio un error que generó un panic: \n %v", reco)
+		}
+	}()
+
+	a := 1
+	if a == 1 {
+		panic("Panic")
+	}
+}
+```
+
+Lo que hace `recover` es que si detecta un `panic` trae el resultado de `panic`, osea que si no hubo `panic` `reco` debería ser `nil`, si hubo `panic` `reco` debería ser un string con el mensaje de error.
+
+Es por eso que podemos validar esto:
+
+```go
+if reco != nil {
+	fmt.Println(reco)
+}
+```
