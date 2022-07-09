@@ -1409,3 +1409,99 @@ if reco != nil {
 	fmt.Println(reco)
 }
 ```
+
+## GoRoutines (ejecución asíncrona - Promesas en Go)
+
+Las `GoRoutines` tiene que ver con el multi-threading y la programación asíncrona.
+
+Si venimos de `NodeJS` sabemos que existen las promesas, los `async` y `await, que son la forma que tiene NodeJS de hacer que el código sea asíncrono. Sin embargo esta forma que tiene node no es tan clara de entender.
+
+Go tiene una forma de hacer eso de una forma mucho mas amigable mediante las `GoRoutines`, las cuales son el equivalente a las promesas y a los `async` y `await` de NodeJS.
+
+```go
+package main
+
+import (
+	"fmt"
+	"strings"
+	"time"
+)
+
+func main() {
+	go miNombreLento("Diego")
+	fmt.Println("Estoy en el main")
+	var x string
+	fmt.Scanln(&x)
+}
+
+func miNombreLento(nombre string) {
+	letras := strings.Split(nombre, "") // Separo las letras del nombre
+	for _, letra := range letra {
+		time.Sleep(1000 * time.Millisecond)
+		fmt.Printf("%s", letra)
+	}
+}
+```
+
+Con la instrucción `go` podemos crear una `GoRoutine` que se ejecute en paralelo con el código principal, es por eso que al ejecutar el código puedo para el programa antes de que se termine de mostrar el nombre.
+
+En Go el runtime no se queda a esperar que termine la función asíncrona, mientras estoy ejecutando la función asíncrona, el sistema termina la ejecución y aborta el programa.
+
+## Channels en Go (Diálogo entre GoRoutines)
+
+Los channels son unos canales que permiten que una goroutine envíe información hacia otra función, ya sea main, otra goroutine, o cualquier otra función.
+
+Esto sirve para que cada función paralela que se esté ejecutando pueda dialogar con otra para enviar información o para recibir información.
+
+Un canal es un espacio de memoria en el que van a dialogar diferentes rutinas y cuando se aloje un valor en ese espacio de memoria, la rutina que está pidiendo un valor va a actuar en consecuencia. Ese espacio de memoria tiene que se de un tipo de dato, en definitiva lo que va a transportar el canal es una variable de ese tipo de dato. 
+
+```go
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func main() {
+	canal := make(chan time.Duration)
+	go bucle(canal)
+	fmt.Println("llegue hasta aquí")
+
+	msg := <-canal // Espero que alguien me envíe un mensaje
+}
+
+func bucle(canal chan time.Duration) {
+	init := time.Now()
+	for i := 0; i < 100; i++ {
+	}
+
+	final := time.Now()
+	canal <- final.Sub(init)
+}
+```
+
+Al escribir:
+
+```go
+canal := make(chan time.Duration)
+```
+
+Estoy creando una canal de tipo `time.Duration`, luego cuando le quiero pasar un dato a ese canal, debo escribir:
+
+```go
+init := time.Now()
+for i := 0; i < 100; i++ {
+}
+
+final := time.Now()
+canal <- final.Sub(init)
+```
+
+Con `<-` le paso un valor al canal, y luego para recibirlo, debo escribir:
+
+```go
+msg := <-canal
+```
+
+Des esta forma creo algo similar al `asyc-await` de NodeJS.
