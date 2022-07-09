@@ -1543,3 +1543,54 @@ func home(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "index.html")
 }
 ```
+
+## Middlewares en Go
+
+Los Middlewares son interceptores. Imaginemos que tenemos un desarrollo hecho hace ya mucho tiempo, por muchas personas, y tenemos muchas funciones, ahora por políticas de la empresa queremos que se le adicione a cada función la grabación de información en un archivo de log, sería una tarea titánica que nos llevaría mucho tiempo.
+
+Para solucionar esto se han creado los middlewares, estos son como muñecas rusas, uno dentro de otro, los cuales nos permiten encapsular la execution de una función ya preexistente con otra función nueva, en otras palabras, va a ejecutar cierto código previo al llamado de la función que ya tenemos.
+
+En código se entiende mas fácil:
+
+```go
+package main
+
+import "fmt"
+
+/* Son interceptores que permiten ejecutar
+instrucciones comunes a varias funciones que reciben y devuelven los mismos tipos variables
+*/
+var resultado int
+
+func main() {
+	fmt.Println("Inicio")
+
+	resultado = opsMidd(sumar)(1, 2)
+	fmt.Println(resultado)
+	resultado = opsMidd(restar)(1, 2)
+	fmt.Println(resultado)
+	resultado = opsMidd(multiplicar)(1, 2)
+	fmt.Println(resultado)
+}
+
+func sumar(a,b int) int {
+	return a + b
+}
+
+func restar(a,b int) int {
+	return a - b
+}
+
+func multiplicar(a,b int) int {
+	return a * b
+}
+
+func opsMidd(f func(int, int) int ) func (int, int) int {
+	return func(a, b int) int {
+		fmt.Println("Inicio de operación")
+		return f(a, b)
+	}
+}
+```
+
+De esta forma podemos ejecutar lógica antes de que se ejecute la función que nos interesa, y luego ejecutarla.
