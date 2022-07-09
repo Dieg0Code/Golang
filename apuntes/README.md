@@ -1505,3 +1505,41 @@ msg := <-canal
 ```
 
 Des esta forma creo algo similar al `asyc-await` de NodeJS.
+
+## Servidor Web en Go
+
+Go cuenta con un paquete llamado `net/http` que permite crear un servidor web.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<h1>Hola mundo</h1>
+</body>
+</html>
+```
+
+```go
+package main
+
+import (
+	"fmt"
+	"net/http"
+)
+
+func main() {
+
+	http.HandleFunc("/", home)
+	http.ListenAndServe(":3000"	, nil)
+	fmt.Println("Server running on port 3000")
+
+}
+
+func home(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "index.html")
+}
+```
